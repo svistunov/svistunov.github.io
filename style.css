@@ -1,0 +1,21 @@
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+#split {
+    display: flex;
+    height: 100%;
+}
+
+#left, #m1 {
+    margin: 5px;
+    flex: 0 0 50%;
+    height: 100%;
+}
+
+#right, #m2 {
+    margin: 5px;
+    flex: 1;
+    height: 100%;
+}
