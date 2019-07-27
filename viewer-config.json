@@ -1,0 +1,18 @@
+{
+	"model": {
+		"animation": {
+			"autoStart": true
+		}
+	},
+	"skybox": {
+		"cubeTexture": {
+			"url": "assets/environment/studio13/studio13"
+		}
+	},
+	"environmentMap": {
+		"texture": "assets/environment/studio13/studio13"
+	},
+	"engine": {
+		"disableResize": false
+	}
+}
