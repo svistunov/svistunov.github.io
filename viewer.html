@@ -3,19 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    
+
     <script src="3rdparty/babylon.viewer.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div id="split">
     <div id="m1">
-        <babylon model="model/m1/Elonva Export001.gltf" extends="minimal">
+        <babylon model="model/m1/Elonva Export001.gltf"
+                 extends="minimal"
+                 configuration="viewer-config.json">
         </babylon>
     </div>
     <div id="m2">
-        <babylon model="model/m2/scene.gltf" 
-        extends="minimal" configuration="viewer-config.json"></babylon>
+        <babylon model="model/m2/scene.gltf"
+                 extends="minimal"
+                 configuration="viewer-config.json">
+        </babylon>
     </div>
 </div>
 </body>

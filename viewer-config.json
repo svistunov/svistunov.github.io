@@ -1,18 +1,19 @@
 {
-	"model": {
-		"animation": {
-			"autoStart": true
-		}
-	},
-	"skybox": {
-		"cubeTexture": {
-			"url": "assets/environment/studio13/studio13"
-		}
-	},
-	"environmentMap": {
-		"texture": "assets/environment/studio13/studio13"
-	},
-	"engine": {
-		"disableResize": false
-	}
+  "model": {
+    "animation": {
+      "autoStart": true
+    }
+  },
+  "environmentMap": {
+    "texture": "assets/environment/studio13/studio13",
+    "mainColor": {
+      "r": 255,
+      "g": 255,
+      "b": 255
+    }
+  },
+  "skybox": {},
+  "engine": {
+    "disableResize": false
+  }
 }
