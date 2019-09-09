@@ -1,4 +1,4 @@
-const canvas = document.getElementById('m1')
+const canvas = document.getElementById('viewer2')
 const engine = new BABYLON.Engine(canvas, true)
 let scene = new BABYLON.Scene(engine)
 const camera = new BABYLON.ArcRotateCamera(`Camera`, Math.PI / 2, Math.PI / 2, 100, BABYLON.Vector3.Zero(), scene)
@@ -211,6 +211,9 @@ function createScene() {
 
 
 scene = createScene()
+window.addEventListener("resize", function () {
+  engine.resize();
+})
 engine.runRenderLoop(function () {
   scene.render()
 
