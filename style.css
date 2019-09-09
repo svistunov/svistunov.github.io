@@ -19,3 +19,8 @@ html, body {
     flex: 1;
     height: 100%;
 }
+
+#viewer2 {
+    height: calc(100vh - 10px);
+    width: calc(100vw - 10px);
+}
