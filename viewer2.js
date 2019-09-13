@@ -11,6 +11,9 @@ const uiPanel = new BABYLON.GUI.StackPanel()
 const cameraSelector = new BABYLON.GUI.StackPanel()
 const puregonData = new BABYLON.GUI.TextBlock()
 
+const cubeTexture = new BABYLON.CubeTexture("assets/environment/studio13/studio13", scene);
+
+scene.environmentTexture = cubeTexture
 
 const puregon = {
   start: 5,
@@ -24,17 +27,15 @@ const puregonDose = {
 
 const puregonEquation = {
   k: (puregonDose.end - puregonDose.start) / (puregon.end - puregon.start),
-  b: - puregon.start * (puregonDose.end - puregonDose.start) / (puregon.end - puregon.start)
+  b: -puregon.start * (puregonDose.end - puregonDose.start) / (puregon.end - puregon.start)
 }
-
 
 let puregonPosition = puregon.start
 const zoom = 1e-1
 let closingTimeout = null
 
-const dose = () => Math.abs((puregonEquation.k *puregonPosition + puregonEquation.b).toFixed(0))
+const dose = () => Math.abs((puregonEquation.k * puregonPosition + puregonEquation.b).toFixed(0))
 const checkBounds = (value) => Math.max(puregon.start, Math.min(puregon.end, value))
-
 
 camera.lowerRadiusLimit = 100
 camera.upperRadiusLimit = 600
@@ -50,13 +51,10 @@ uiPanel.addControl(cameraSelector)
 uiPanel.addControl(puregonData)
 GUI.addControl(uiPanel)
 
-
 function setPuregonPosition (value) {
   puregonPosition = value
   puregonData.text = `Dose: ${dose()}`
 }
-
-
 
 function setActiveItem (itemTitle) {
   activeItem = itemTitle
@@ -85,6 +83,15 @@ function loadModel ({scene, root, name, title, cameraScale = 10, position = BABY
   addCameraSelector(title)
   BABYLON.SceneLoader.LoadAssetContainer(root, name, scene, function (newScene) {
     try {
+      newScene.materials.forEach(mat => {
+        if(mat.id === "08_-_Defaultffff") {
+          mat.refractionTexture = scene.environmentTexture
+          mat.subSurface.isRefractionEnabled = true
+          mat.subSurface.intensity = 1
+          mat.subSurface.indexOfRefraction = 1.8
+        }
+      })
+
       models.push({scene, root, name, title, cameraScale, position})
       const rootNode = new BABYLON.TransformNode()
       newScene.meshes.forEach(mesh => {
@@ -119,7 +126,7 @@ function loadModel ({scene, root, name, title, cameraScale = 10, position = BABY
       rootNode.position = position
       newScene.animationGroups.forEach(group => group.stop())
       newScene.addAllToScene()
-      if(active) {
+      if (active) {
         setActiveItem(title)
       }
     } catch (e) {
@@ -128,7 +135,6 @@ function loadModel ({scene, root, name, title, cameraScale = 10, position = BABY
     }
   })
 }
-
 
 function animationOnClickHandler (scene, mesh) {
   scene.animationGroups.forEach(group => group.start())
@@ -163,57 +169,59 @@ function puregonDragEndHandler (scene) {
   setPuregonPosition(puregon.start)
 }
 
-
-
-function createScene() {
+function createScene (models) {
   BABYLON.SceneLoader.OnPluginActivatedObservable.add(function (plugin) {
     plugin.animationstartmode = BABYLON.GLTFLoaderAnimationStartMode.NONE
   }, undefined, undefined, undefined, true)
   scene.clearColor = new BABYLON.Color3(1, 1, 1)
   scene.createDefaultLight(true)
-  loadModel({
-    active: true,
-    scene,
-    root: 'model/orgal006/',
-    name: 'scene.gltf',
-    title: 'orgal',
-    handlers: {
-      onMeshClick: animationOnClickHandler
+  const configurations = [
+    {
+      scene,
+      root: 'model/orgal006/',
+      name: 'scene.gltf',
+      title: 'orgal',
+      handlers: {
+        onMeshClick: animationOnClickHandler
+      }
+    },
+    {
+      scene,
+      root: 'model/puregon_export-005/',
+      name: 'scene.gltf',
+      title: 'puregon',
+      position: new BABYLON.Vector3(400, 0, 0),
+      handlers: {
+        onMeshClick: puregonAnimationOnClickHandler,
+        onMeshDrag: puregonDragHandler
+      }
+    },
+    {
+      scene,
+      root: 'model/elnova_export05/',
+      name: 'scene.gltf',
+      title: 'elnova',
+      position: new BABYLON.Vector3(-400, 0, 0),
+      handlers: {
+        onMeshClick: animationOnClickHandler
+      }
     }
-  })
-
-  loadModel({
-    scene,
-    root: 'model/puregon_export-005/',
-    name: 'scene.gltf',
-    title: 'puregon',
-    position: new BABYLON.Vector3(400, 0, 0),
-    handlers: {
-      onMeshClick: puregonAnimationOnClickHandler,
-      onMeshDrag: puregonDragHandler
-    }
-  })
-
-  loadModel({
-    scene,
-    root: 'model/elnova_export05/',
-    name: 'scene.gltf',
-    title: 'elnova',
-    position: new BABYLON.Vector3(-400, 0, 0),
-    handlers: {
-      onMeshClick: animationOnClickHandler
-    }
-  })
+  ]
+  let visibleItems = configurations
+  if (models) {
+    visibleItems = visibleItems.filter(({title}) => models.includes(title))
+    visibleItems.push({...visibleItems.pop(), active: true})
+  }
+  visibleItems.forEach(loadModel)
 
   return scene
 }
 
-
-
-scene = createScene()
-window.addEventListener("resize", function () {
-  engine.resize();
+scene = createScene((typeof MODELS !== 'undefined') && MODELS)
+window.addEventListener('resize', function () {
+  engine.resize()
 })
+
 engine.runRenderLoop(function () {
   scene.render()
 

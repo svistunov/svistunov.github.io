@@ -24,3 +24,16 @@ html, body {
     height: calc(100vh - 10px);
     width: calc(100vw - 10px);
 }
+
+.main {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pages {
+    resize: both;
+    text-align: center;
+}
