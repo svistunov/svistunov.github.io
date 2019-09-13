@@ -108,6 +108,7 @@ function loadModel ({scene, root, name, title, cameraScale = 10, position = BABY
                 setActiveItem(title)
               } else {
                 handlers.onMeshClick && handlers.onMeshClick(newScene, mesh)
+                setActiveItem(title)
               }
             })
         )
