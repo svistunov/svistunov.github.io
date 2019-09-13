@@ -58,7 +58,8 @@ function setPuregonPosition (value) {
 
 function setActiveItem (itemTitle) {
   activeItem = itemTitle
-  camera.target = models.find(({title}) => title === itemTitle).position
+  const target = models.find(({title}) => title === itemTitle)
+  camera.target = target.cameraPosition || target.position
   buttons.find(({title}) => title === itemTitle).button.isChecked = true
 }
 
@@ -79,7 +80,7 @@ function addCameraSelector (title) {
   buttons.push({button, title})
 }
 
-function loadModel ({scene, root, name, title, cameraScale = 10, position = BABYLON.Vector3.Zero(), active = false, handlers}) {
+function loadModel ({scene, root, name, title, cameraScale = 10, position = BABYLON.Vector3.Zero(), cameraPosition, active = false, handlers}) {
   addCameraSelector(title)
   BABYLON.SceneLoader.LoadAssetContainer(root, name, scene, function (newScene) {
     try {
@@ -92,7 +93,7 @@ function loadModel ({scene, root, name, title, cameraScale = 10, position = BABY
         }
       })
 
-      models.push({scene, root, name, title, cameraScale, position})
+      models.push({scene, root, name, title, cameraScale, position, cameraPosition})
       const rootNode = new BABYLON.TransformNode()
       newScene.meshes.forEach(mesh => {
         if (!mesh.parent) {
@@ -191,6 +192,7 @@ function createScene (models) {
       name: 'scene.gltf',
       title: 'puregon',
       position: new BABYLON.Vector3(400, 0, 0),
+      cameraPosition: new BABYLON.Vector3(362, 0, 0),
       handlers: {
         onMeshClick: puregonAnimationOnClickHandler,
         onMeshDrag: puregonDragHandler
@@ -202,6 +204,7 @@ function createScene (models) {
       name: 'scene.gltf',
       title: 'elnova',
       position: new BABYLON.Vector3(-400, 0, 0),
+      cameraPosition: new BABYLON.Vector3(-362, 0, 0),
       handlers: {
         onMeshClick: animationOnClickHandler
       }
