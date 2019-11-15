@@ -10,10 +10,13 @@ const GUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI('UI', null, sc
 const uiPanel = new BABYLON.GUI.StackPanel()
 const cameraSelector = new BABYLON.GUI.StackPanel()
 const puregonData = new BABYLON.GUI.TextBlock()
+const elonvaExplodeButton = new BABYLON.GUI.Button.CreateSimpleButton('elonvaExplodeButton', 'Собрать/Разобрать')
 
-const cubeTexture = new BABYLON.CubeTexture("assets/environment/studio13/studio13", scene);
+const cubeTexture = new BABYLON.CubeTexture('assets/environment/studio13/studio13', scene)
 
 scene.environmentTexture = cubeTexture
+
+let isExploded = false
 
 const puregon = {
   start: 5,
@@ -43,12 +46,23 @@ camera.attachControl(canvas, true)
 
 puregonData.height = '30px'
 puregonData.width = '210px'
+
+elonvaExplodeButton.height = '30px'
+elonvaExplodeButton.width = '180px'
+elonvaExplodeButton.background = '#eee'
+elonvaExplodeButton.isVisible = false
+elonvaExplodeButton.onPointerDownObservable.add(function () {
+  explodeElonva(isExploded)
+  isExploded = !isExploded
+})
+
 uiPanel.width = '210px'
 uiPanel.isVertical = true
 uiPanel.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT
 uiPanel.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP
 uiPanel.addControl(cameraSelector)
 uiPanel.addControl(puregonData)
+uiPanel.addControl(elonvaExplodeButton)
 GUI.addControl(uiPanel)
 
 function setPuregonPosition (value) {
@@ -61,6 +75,7 @@ function setActiveItem (itemTitle) {
   const target = models.find(({title}) => title === itemTitle)
   camera.target = target.cameraPosition || target.position
   buttons.find(({title}) => title === itemTitle).button.isChecked = true
+  elonvaExplodeButton.isVisible = itemTitle === 'elonva'
 }
 
 function addCameraSelector (title) {
@@ -85,7 +100,7 @@ function loadModel ({scene, root, name, title, cameraScale = 10, position = BABY
   BABYLON.SceneLoader.LoadAssetContainer(root, name, scene, function (newScene) {
     try {
       newScene.materials.forEach(mat => {
-        if(mat.id === "08_-_Defaultffff") {
+        if (mat.id === '08_-_Defaultffff') {
           mat.refractionTexture = scene.environmentTexture
           mat.subSurface.isRefractionEnabled = true
           mat.subSurface.intensity = 1
@@ -140,6 +155,16 @@ function loadModel ({scene, root, name, title, cameraScale = 10, position = BABY
 
 function animationOnClickHandler (scene, mesh) {
   scene.animationGroups.forEach(group => group.start())
+}
+
+function elonvaAnimationOnClickHandler (scene, mesh) {
+  scene.animationGroups.forEach(group => group.start(false, 1, 0, 5))
+}
+
+function explodeElonva (isExploded = false) {
+  const [speed, start, end] = isExploded ? [-1, 6.5, 5] : [1, 5, 6.5]
+  scene.animationGroups.forEach(group => group.start(false, speed, start, end))
+  scene.meshes.find(mesh => mesh.id.includes('Sting Kolpak')).setEnabled(isExploded)
 }
 
 function puregonAnimationOnClickHandler (scene, mesh) {
@@ -201,13 +226,13 @@ function createScene (models) {
     },
     {
       scene,
-      root: 'model/elnova_export05/',
+      root: 'model/elonva_export07/',
       name: 'scene.gltf',
-      title: 'elnova',
+      title: 'elonva',
       position: new BABYLON.Vector3(-400, 0, 0),
       cameraPosition: new BABYLON.Vector3(-362, 0, 0),
       handlers: {
-        onMeshClick: animationOnClickHandler
+        onMeshClick: elonvaAnimationOnClickHandler
       }
     }
   ]
